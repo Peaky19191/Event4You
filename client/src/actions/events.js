@@ -9,7 +9,7 @@ export const getEvents = () => async (dispatch) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 export const createEvent = (event) => async (dispatch) => {
     try {
@@ -19,7 +19,7 @@ export const createEvent = (event) => async (dispatch) => {
     } catch (error) {
         console.log(error);
     }
-}
+};
 
 export const updateEvent = (id, event) => async (dispatch) => {
     try {
@@ -29,24 +29,26 @@ export const updateEvent = (id, event) => async (dispatch) => {
     } catch (error) {
         console.log(error);
     }
-}
-
-export const deleteEvent = (id) => async (dispatch) => {
-    try {
-        await api.deleteEvent(id);
-
-        dispatch({ type: DELETE, payload: id })
-    } catch (error) {
-        console.log(error);
-    }
-}
+};
 
 export const likeEvent = (id) => async (dispatch) => {
+    const user = JSON.parse(localStorage.getItem('profile'));
+
     try {
-        const { data } = await api.likeEvent(id);
+        const { data } = await api.likeEvent(id, user?.token);
 
         dispatch({ type: LIKE, payload: data });
     } catch (error) {
         console.log(error);
     }
-}
+};
+
+export const deleteEvent = (id) => async (dispatch) => {
+    try {
+        await await api.deleteEvent(id);
+
+        dispatch({ type: DELETE, payload: id });
+    } catch (error) {
+        console.log(error);
+    }
+};

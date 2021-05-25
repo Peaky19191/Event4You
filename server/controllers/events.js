@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 
 import EventMessage from '../models/eventMessage.js';
 
+const router = express.Router();
+
 export const getEvents = async (req, res) => {
     try {
         const eventMessages = await EventMessage.find();
@@ -13,27 +15,41 @@ export const getEvents = async (req, res) => {
     }
 }
 
+export const getEvent = async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const event = await EventMessage.findById(id);
+
+        res.status(200).json(event);
+    } catch (error) {
+        res.status(404).json({ message: error.message });
+    }
+}
+
 export const createEvent = async (req, res) => {
     const event = req.body;
 
-    const newEvent = new EventMessage(event);
+    const newEventMessage = new EventMessage({ ...event, creator: req.userId, createdAt: new Date().toISOString() })
 
     try {
-        await newEvent.save();
+        await newEventMessage.save();
 
-        res.status(201).json(newEvent);
+        res.status(201).json(newEventMessage);
     } catch (error) {
         res.status(409).json({ message: error.message });
     }
 }
 
 export const updateEvent = async (req, res) => {
-    const { id: _id } = req.params;
-    const event = req.body;
+    const { id } = req.params;
+    const { title, message, creator, selectedFile, tags } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).send('No post with that id');
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No event with id: ${id}`);
 
-    const updatedEvent = await EventMessage.findByIdAndUpdate(_id, event, { new: true });
+    let updatedEvent = { creator, title, message, tags, selectedFile, _id: id };
+
+    updatedEvent = await EventMessage.findByIdAndUpdate(id, updatedEvent, { new: true });
 
     res.json(updatedEvent);
 }
@@ -41,21 +57,34 @@ export const updateEvent = async (req, res) => {
 export const deleteEvent = async (req, res) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send('No post with that id');
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No event with id: ${id}`);
 
     await EventMessage.findByIdAndRemove(id);
 
-    res.json({ message: 'Event deleted successfully' });
+    res.json({ message: "Event deleted successfully." });
 }
 
 export const likeEvent = async (req, res) => {
     const { id } = req.params;
 
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send('No post with that id');
+    if (!req.userId) {
+        return res.json({ message: "Unauthenticated" });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).send(`No event with id: ${id}`);
 
     const event = await EventMessage.findById(id);
 
-    const upatedEvent = await EventMessage.findByIdAndUpdate(id, { likeCount: event.likeCount + 1 }, { new: true });
+    const index = event.likes.findIndex((id) => id === String(req.userId));
 
-    res.json(upatedEvent);
+    if (index === -1) {
+        event.likes.push(req.userId);
+    } else {
+        event.likes = event.likes.filter((id) => id !== String(req.userId));
+    }
+    const updatedEvent = await EventMessage.findByIdAndUpdate(id, event, { new: true });
+    res.status(200).json(updatedEvent);
 }
+
+
+export default router;
