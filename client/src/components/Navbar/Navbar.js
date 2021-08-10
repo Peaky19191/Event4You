@@ -4,27 +4,36 @@ import useStyles from './styles';
 import logo from '../../images/logo.png';
 import { Link, useHistory, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux';
+import decode from 'jwt-decode';
 
 const Navbar = () => {
     const classes = useStyles();
-    const [user, setUSer] = useState(JSON.parse(localStorage.getItem('profile')));
+    const [user, setUser] = useState(JSON.parse(localStorage.getItem('profile')));
 
-    const locaction = useLocation();
+    const location = useLocation();
     const history = useHistory();
     const dispatch = useDispatch();
+
     const logout = () => {
         dispatch({ type: 'LOGOUT' })
 
         history.push('/');
 
-        setUSer(null);
+        setUser(null);
     };
 
     useEffect(() => {
         const token = user?.token;
 
-        setUSer(JSON.parse(localStorage.getItem('profile')));
-    }, [locaction]);
+        if (token) {
+            const decodedToken = decode(token);
+
+            if (decodedToken.exp * 1000 < new Date().getTime()) logout();
+        }
+
+        setUser(JSON.parse(localStorage.getItem('profile')));
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [location]);
 
     return (
         <AppBar className={classes.appBar} position="static" color="inherit">

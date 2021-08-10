@@ -1,6 +1,6 @@
 import { FETCH_ALL, CREATE, UPDATE, DELETE, LIKE } from '../constants/actionTypes';
 
-export default (events = [], action) => {
+const eventReducer = (events = [], action) => {
     switch (action.type) {
         case FETCH_ALL:
             return action.payload;
@@ -16,4 +16,6 @@ export default (events = [], action) => {
             return events;
     }
 };
+
+export default eventReducer;
 
