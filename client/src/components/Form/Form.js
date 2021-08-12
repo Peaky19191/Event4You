@@ -38,7 +38,7 @@ const Form = ({ currentId, setCurrentId }) => {
         return (
             <Paper className={classes.paper}>
                 <Typography variant="h6" align="center">
-                    Please Sign In to create your own memories and like other's memories.
+                    Please Sign In to create your own event and like other's events.
                 </Typography>
             </Paper>
         );
@@ -47,7 +47,7 @@ const Form = ({ currentId, setCurrentId }) => {
     return (
         <Paper className={classes.paper}>
             <form autoComplete="off" noValidate className={`${classes.root} ${classes.form}`} onSubmit={handleSubmit}>
-                <Typography variant="h6">{currentId ? `Editing "${event.title}"` : 'Creating a Memory'}</Typography>
+                <Typography variant="h6">{currentId ? `Editing "${event.title}"` : 'Creating an Event'}</Typography>
                 <TextField name="title" variant="outlined" label="Title" fullWidth value={eventData.title} onChange={(e) => setEventData({ ...eventData, title: e.target.value })} />
                 <TextField name="message" variant="outlined" label="Message" fullWidth multiline rows={4} value={eventData.message} onChange={(e) => setEventData({ ...eventData, message: e.target.value })} />
                 <TextField name="tags" variant="outlined" label="Tags (coma separated)" fullWidth value={eventData.tags} onChange={(e) => setEventData({ ...eventData, tags: e.target.value.split(',') })} />
