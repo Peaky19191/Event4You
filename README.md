@@ -6,3 +6,6 @@ I am going to be adding further functionalities, such as commentary section, sea
 
 Setup:
 - run ```npm i && npm start``` for client and server side.
+
+Live:
+https://event4you-kkopec.netlify.app/
